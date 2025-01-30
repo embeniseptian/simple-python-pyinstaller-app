@@ -16,10 +16,5 @@ node {
             junit 'test-reports/results.xml' // dipindahkan ke dalam blok 'inside' agar dijalankan di dalam kontainer
         }
     }
-    stage('Deliver') {
-        docker.image('cdrx/pyinstaller-linux:python2').inside {
-            sh 'pyinstaller --onefile sources/add2vals.py'
-            archiveArtifacts 'dist/add2vals' // dipindahkan ke dalam blok 'inside' dan dihapus kondisi 'success'
-        }
-    }
+
 }
