@@ -10,7 +10,7 @@ pipeline {
 
                 docker {
 
-                    image 'python:3.9'
+                    image 'python:2-alpine'
 
                 }
 
@@ -72,7 +72,7 @@ pipeline {
 
                 docker {
 
-                    image 'python:3.9'
+                    image 'python:2-alpine'
 
                     args '-u root'
 
