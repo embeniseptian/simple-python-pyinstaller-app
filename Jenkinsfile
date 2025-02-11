@@ -63,7 +63,7 @@ pipeline {
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH yang Anda buat di Jenkins
+                                configName: 'MyEC2', // Nama konfigurasi SSH yang Anda buat di Jenkins
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: 'dist/add2vals', // File yang akan di-deploy
