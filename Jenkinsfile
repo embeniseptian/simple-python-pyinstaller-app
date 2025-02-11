@@ -57,6 +57,7 @@ pipeline {
         }
 
         stage('Deploy to AWS EC2') {
+            agent any // Atau gunakan `node` untuk menentukan executor
             steps {
                 script {
                     // Transfer file hasil build ke EC2 instance
