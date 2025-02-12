@@ -41,12 +41,6 @@ pipeline {
         stage('Deploy to AWS EC2') {
             agent any // Gunakan executor/node untuk stage ini
             steps {
-                // Buat direktori sources dan file add2vals.py
-                sh 'mkdir -p sources'
-                sh 'echo "print(\'Hello, World!\')" > sources/add2vals.py'
-                stash(name: 'source-code', includes: 'sources/*.py')
-            }
-            steps {
                 script {
                     // Step 1: Transfer source code ke EC2
                     sshPublisher(
