@@ -70,7 +70,8 @@ pipeline {
                                             cd /home/ec2-user/app && 
                                             docker run --rm -v $(pwd):/app -w /app python:3.9 sh -c "
                                                 pip install pyinstaller && 
-                                                pyinstaller --onefile sources/add2vals.py
+                                                pyinstaller --onefile sources/add2vals.py &&
+                                                sleep time: 1, unit: 'MINUTES'
                                             " && 
                                             echo 'Build artifacts created successfully.' && 
                                             ls -l dist/
