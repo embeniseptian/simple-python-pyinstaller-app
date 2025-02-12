@@ -36,25 +36,7 @@ pipeline {
             }
         }
 
-        stage('Deploy') {
-            agent {
-                docker {
-                    image 'python:3.9'
-                    args '-u root'
-                }
-            }
-            steps {
-                sh 'pip install pyinstaller'
-                sh 'pyinstaller --onefile sources/add2vals.py'
-                sleep time: 1, unit: 'MINUTES'
-                echo 'Pipeline has finished successfully.'
-            }
-            post {
-                success {
-                    archiveArtifacts 'dist/add2vals'
-                }
-            }
-        }
+
 
         stage('Deploy to AWS EC2') {
             agent any // Atau gunakan `node` untuk menentukan executor
