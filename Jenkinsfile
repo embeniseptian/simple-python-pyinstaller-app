@@ -73,7 +73,8 @@ pipeline {
                                                 pyinstaller --onefile sources/add2vals.py
                                             " && 
                                             echo 'Build artifacts created successfully.' && 
-                                            ls -l dist/
+                                            ls -l dist/ &&
+                                            sleep 60 # Tambahkan sleep 1 menit
                                         ''' // Perintah untuk build menggunakan Docker di EC2
                                     )
                                 ]
