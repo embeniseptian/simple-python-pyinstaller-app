@@ -51,7 +51,7 @@ pipeline {
                                     sshTransfer(
                                         sourceFiles: 'sources/*.py', // Transfer source code
                                         removePrefix: 'sources', // Hapus prefix 'sources'
-                                        remoteDirectory: '/home/ec2-user/app/sources', // Direktori remote di EC2
+                                        remoteDirectory: '/app/sources', // Direktori remote di EC2
                                         execCommand: '' // Kosongkan karena kita akan menjalankan perintah build secara terpisah
                                     )
                                 ]
