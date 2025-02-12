@@ -39,69 +39,72 @@ pipeline {
 
 
         stage('Deploy to AWS EC2') {
-            agent any // Gunakan executor/node untuk stage ini
-            steps {
-                script {
-                    // Step 1: Transfer source code ke EC2
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
-                                transfers: [
-                                    sshTransfer(
-                                        sourceFiles: 'sources/*.py', // Transfer source code
-                                        removePrefix: 'sources', // Hapus prefix 'sources'
-                                        remoteDirectory: '/home/ec2-user/app/sources', // Direktori remote di EC2
-                                        execCommand: '' // Kosongkan karena kita akan menjalankan perintah build secara terpisah
-                                    )
-                                ]
+    agent any
+    steps {
+        script {
+            // Step 1: Transfer source code ke EC2
+            sshPublisher(
+                publishers: [
+                    sshPublisherDesc(
+                        configName: 'MyEC2',
+                        transfers: [
+                            sshTransfer(
+                                sourceFiles: 'sources/*.py',
+                                removePrefix: 'sources',
+                                remoteDirectory: '/home/ec2-user/app/sources',
+                                execCommand: ''
                             )
                         ]
                     )
+                ]
+            )
 
-                    // Step 2: Jalankan perintah build dan deploy di EC2
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
-                                transfers: [
-                                    sshTransfer(
-                                        execCommand: '''
-                                            cd /home/ec2-user/app && 
-                                            docker run --rm -v $(pwd):/app -w /app python:3.9 sh -c "
-                                                pip install pyinstaller && 
-                                                pyinstaller --onefile sources/add2vals.py
-                                            " && 
-                                            echo 'Build artifacts created successfully.' && 
-                                            ls -l dist/
-                                        ''' // Perintah untuk build menggunakan Docker di EC2
-                                    )
-                                ]
+            // Step 2: Jalankan perintah build dan deploy di EC2
+            sshPublisher(
+                publishers: [
+                    sshPublisherDesc(
+                        configName: 'MyEC2',
+                        transfers: [
+                            sshTransfer(
+                                execCommand: '''
+                                    cd /home/ec2-user/app && 
+                                    docker run --rm -v $(pwd):/app -w /app python:3.9 sh -c "
+                                        pip install pyinstaller && 
+                                        pyinstaller --onefile sources/add2vals.py
+                                    " && 
+                                    echo 'Build artifacts created successfully.' && 
+                                    ls -l dist/
+                                '''
                             )
                         ]
                     )
-                }
-            }
-            post {
-                success {
-                    // Step 3: Transfer artifacts hasil build kembali ke Jenkins (opsional)
-                    sshPublisher(
-                        publishers: [
-                            sshPublisherDesc(
-                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
-                                transfers: [
-                                    sshTransfer(
-                                        sourceFiles: '/home/ec2-user/app/dist/add2vals', // Transfer hasil build
-                                        remoteDirectory: 'dist', // Direktori tujuan di Jenkins
-                                        execCommand: '' // Kosongkan karena kita hanya ingin mentransfer file
-                                    )
-                                ]
-                            )
-                        ]
-                    )
-                    archiveArtifacts 'dist/add2vals' // Archive artifacts di Jenkins
-                }
-            }
+                ]
+            )
         }
+    }
+    post {
+        success {
+            // Step 3: Transfer artifacts hasil build kembali ke Jenkins (opsional)
+            sshPublisher(
+                publishers: [
+                    sshPublisherDesc(
+                        configName: 'MyEC2',
+                        transfers: [
+                            sshTransfer(
+                                sourceFiles: '/home/ec2-user/app/dist/add2vals',
+                                remoteDirectory: 'dist',
+                                execCommand: ''
+                            )
+                        ]
+                    )
+                ]
+            )
+            archiveArtifacts 'dist/add2vals'
+        }
+        failure {
+            echo 'Build failed. Check the logs for more details.'
+        }
+    }
+}
     }
 }
