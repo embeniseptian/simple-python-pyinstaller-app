@@ -46,7 +46,7 @@ pipeline {
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH di Jenkins
+                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: 'sources/*.py', // Transfer source code
@@ -63,7 +63,7 @@ pipeline {
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH di Jenkins
+                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
                                 transfers: [
                                     sshTransfer(
                                         execCommand: '''
@@ -88,7 +88,7 @@ pipeline {
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH di Jenkins
+                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: '/home/ec2-user/app/dist/add2vals', // Transfer hasil build
