@@ -39,19 +39,33 @@ pipeline {
 
 
         stage('Deploy to AWS EC2') {
-            agent any // Atau gunakan `node` untuk menentukan executor
+            agent any // Gunakan executor/node untuk stage ini
             steps {
                 script {
-                    // Transfer file hasil build ke EC2 instance
+                    // Step 1: Transfer source code ke EC2
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: 'MyEC2', // Nama konfigurasi SSH yang Anda buat di Jenkins
+                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH di Jenkins
                                 transfers: [
                                     sshTransfer(
-                                        sourceFiles: 'sources/*.py', // File yang akan di-deploy
-                                        removePrefix: 'sources', // Hapus prefix 'dist' saat mengirim ke remote
-                                        remoteDirectory: '/home/ec2-user/app/sources', // Direktori remote di EC2 instance
+                                        sourceFiles: 'sources/*.py', // Transfer source code
+                                        removePrefix: 'sources', // Hapus prefix 'sources'
+                                        remoteDirectory: '/home/ec2-user/app/sources', // Direktori remote di EC2
+                                        execCommand: '' // Kosongkan karena kita akan menjalankan perintah build secara terpisah
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+
+                    // Step 2: Jalankan perintah build dan deploy di EC2
+                    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH di Jenkins
+                                transfers: [
+                                    sshTransfer(
                                         execCommand: '''
                                             cd /home/ec2-user/app && 
                                             docker run --rm -v $(pwd):/app -w /app python:3.9 sh -c "
@@ -74,7 +88,7 @@ pipeline {
                     sshPublisher(
                         publishers: [
                             sshPublisherDesc(
-                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
+                                configName: 'your-ssh-config-name', // Nama konfigurasi SSH di Jenkins
                                 transfers: [
                                     sshTransfer(
                                         sourceFiles: '/home/ec2-user/app/dist/add2vals', // Transfer hasil build
