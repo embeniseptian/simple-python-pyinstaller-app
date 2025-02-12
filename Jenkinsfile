@@ -50,8 +50,7 @@ pipeline {
                         transfers: [
                             sshTransfer(
                                 sourceFiles: 'sources/*.py',
-                                removePrefix: 'sources',
-                                remoteDirectory: '/home/ec2-user/app/sources',
+                                remoteDirectory: '/home/ec2-user/app',
                                 execCommand: ''
                             )
                         ]
