@@ -67,15 +67,43 @@ pipeline {
                                 configName: 'MyEC2', // Nama konfigurasi SSH yang Anda buat di Jenkins
                                 transfers: [
                                     sshTransfer(
-                                        sourceFiles: 'dist/add2vals', // File yang akan di-deploy
-                                        removePrefix: 'dist', // Hapus prefix 'dist' saat mengirim ke remote
-                                        remoteDirectory: '/path/to/remote/directory', // Direktori remote di EC2 instance
-                                        execCommand: 'chmod +x /path/to/remote/directory/add2vals && /path/to/remote/directory/add2vals' // Perintah yang akan dijalankan setelah file di-transfer
+                                        sourceFiles: 'sources/*.py', // File yang akan di-deploy
+                                        removePrefix: 'sources', // Hapus prefix 'dist' saat mengirim ke remote
+                                        remoteDirectory: '/home/ec2-user/app/sources', // Direktori remote di EC2 instance
+                                        execCommand: '''
+                                            cd /home/ec2-user/app && 
+                                            docker run --rm -v $(pwd):/app -w /app python:3.9 sh -c "
+                                                pip install pyinstaller && 
+                                                pyinstaller --onefile sources/add2vals.py
+                                            " && 
+                                            echo 'Build artifacts created successfully.' && 
+                                            ls -l dist/
+                                        ''' // Perintah untuk build menggunakan Docker di EC2
                                     )
                                 ]
                             )
                         ]
                     )
+                }
+            }
+            post {
+                success {
+                    // Step 3: Transfer artifacts hasil build kembali ke Jenkins (opsional)
+                    sshPublisher(
+                        publishers: [
+                            sshPublisherDesc(
+                                configName: 'MyEC2', // Nama konfigurasi SSH di Jenkins
+                                transfers: [
+                                    sshTransfer(
+                                        sourceFiles: '/home/ec2-user/app/dist/add2vals', // Transfer hasil build
+                                        remoteDirectory: 'dist', // Direktori tujuan di Jenkins
+                                        execCommand: '' // Kosongkan karena kita hanya ingin mentransfer file
+                                    )
+                                ]
+                            )
+                        ]
+                    )
+                    archiveArtifacts 'dist/add2vals' // Archive artifacts di Jenkins
                 }
             }
         }
